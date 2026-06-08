@@ -1,0 +1,505 @@
+:root {
+  --bg: #171c21;
+  --panel: rgba(0, 0, 0, 0.66);
+  --panel-soft: rgba(10, 20, 40, 0.82);
+  --line: rgba(226, 222, 211, 0.26);
+  --line-bright: #e2ded3;
+  --gold: #fcc413;
+  --gold-soft: #ffdb7e;
+  --ink: #fffde4;
+  --muted: rgba(233, 225, 209, 0.62);
+  --muted-2: rgba(233, 225, 209, 0.42);
+  --good: #6fd49c;
+  --bad: #f15050;
+  --hud-blue: #3cd3fc;
+  --hud-blue-glow: #4fc0ff;
+  --hud-blue-dark: #0a8dd7;
+  --shadow: 0 0 11px rgba(0, 0, 0, 0.82);
+  --hud-blue-aura: 0 0 8px rgba(79, 192, 255, 0.82), 0 1px 11px rgba(10, 141, 215, 0.66);
+  --hud-wide-aura: 0 0 34px rgba(255, 255, 255, 0.2), 0 0 30px rgba(50, 167, 233, 0.58);
+  --hud-gold-aura: 0 0 6px rgba(255, 184, 0, 0.68), 0 0 10px rgba(255, 219, 126, 0.48);
+  --hud-menu-aura: inset 0 0 7px 3px rgba(246, 231, 152, 0.28), 0 0 12px 1px rgba(227, 227, 200, 0.46);
+}
+
+html {
+  background: #171c21;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(60, 211, 252, 0.22), transparent 31rem),
+    radial-gradient(circle at 12% 8%, rgba(252, 196, 19, 0.12), transparent 20rem),
+    radial-gradient(circle at 85% 75%, rgba(60, 211, 252, 0.13), transparent 24rem),
+    linear-gradient(135deg, rgba(255, 253, 228, 0.04) 0 1px, transparent 1px 25px),
+    linear-gradient(45deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.58)),
+    #66645d;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 253, 228, 0.05), rgba(255, 253, 228, 0.05) 1px, transparent 1px, transparent 6px),
+    linear-gradient(90deg, transparent 0 49.75%, rgba(60, 211, 252, 0.08) 49.75% 50.25%, transparent 50.25%),
+    linear-gradient(0deg, transparent 0 49.75%, rgba(60, 211, 252, 0.07) 49.75% 50.25%, transparent 50.25%);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+
+body::after {
+  background:
+    radial-gradient(circle at center, transparent 36%, rgba(0, 0, 0, 0.24) 68%, rgba(0, 0, 0, 0.72)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.48));
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--hud-blue);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  position: relative;
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  top: 12px;
+  right: 10px;
+  width: min(44vw, 380px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(60, 211, 252, 0.2);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 42%, rgba(60, 211, 252, 0.12) 42.4% 43%, transparent 43.5%),
+    radial-gradient(circle, transparent 0 60%, rgba(226, 222, 211, 0.06) 60.5% 61%, transparent 61.5%),
+    conic-gradient(from 22deg, transparent 0 18%, rgba(60, 211, 252, 0.24), transparent 38% 100%);
+  filter: drop-shadow(0 0 18px rgba(60, 211, 252, 0.18));
+  pointer-events: none;
+}
+
+.card,
+.case-card,
+.modal,
+.mobile-case-nav,
+.button,
+.icon-button,
+.segmented,
+.case-file-tabs,
+.timeline li,
+.clues li,
+.review-list li,
+.truth-choice,
+.new-clue-callout,
+.nick-dialogue,
+.locked-state {
+  position: relative;
+  border: 0;
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 228, 0.045), rgba(255, 253, 228, 0.006)),
+    rgba(0, 0, 0, 0.64);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card::after,
+.case-card::after,
+.modal::after,
+.mobile-case-nav::after,
+.button::after,
+.icon-button::after,
+.segmented::after,
+.case-file-tabs::after,
+.timeline li::after,
+.clues li::after,
+.review-list li::after,
+.truth-choice::after,
+.new-clue-callout::after,
+.nick-dialogue::after,
+.locked-state::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(226, 222, 211, 0.26);
+  border-radius: 2px;
+  pointer-events: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.card::before,
+.case-card::before,
+.modal::before,
+.mobile-case-nav::before,
+.button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 9%;
+  right: 9%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hud-blue), var(--ink), var(--hud-blue), transparent);
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.card > *,
+.case-card > *,
+.modal > *,
+.mobile-case-nav > *,
+.button > *,
+.icon-button > *,
+.segmented > *,
+.case-file-tabs > *,
+.timeline li > *,
+.clues li > *,
+.review-list li > *,
+.truth-choice > *,
+.new-clue-callout > *,
+.nick-dialogue > *,
+.locked-state > * {
+  position: relative;
+  z-index: 1;
+}
+
+.case-page .case-header {
+  border-bottom: 0;
+  background:
+    linear-gradient(90deg, rgba(60, 211, 252, 0.1), transparent 30%, rgba(252, 196, 19, 0.06)),
+    rgba(5, 8, 11, 0.9);
+  box-shadow: var(--shadow), var(--hud-blue-aura);
+}
+
+.case-page .case-header::after {
+  content: "";
+  position: absolute;
+  inset: 4px 12px 6px;
+  border: 1px solid rgba(60, 211, 252, 0.36);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.case-page .case-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hud-blue), var(--ink), transparent);
+  opacity: 0.72;
+}
+
+.case-back-button {
+  width: 54px;
+  min-width: 54px;
+  height: 54px;
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.case-back-button:hover {
+  color: var(--hud-blue);
+  box-shadow: var(--hud-blue-aura);
+}
+
+.segmented {
+  background: rgba(0, 0, 0, 0.56);
+  padding: 4px;
+}
+
+.segmented button {
+  border-radius: 4px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.segmented button.is-active {
+  background: rgba(252, 196, 19, 0.16);
+  color: var(--gold-soft);
+  box-shadow: var(--hud-gold-aura);
+}
+
+.progress__meta {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-shadow: 0 0 8px rgba(79, 192, 255, 0.18);
+}
+
+.progress__meta strong,
+.mini-count,
+.eyebrow,
+.clue-label,
+.word-token.is-focus-word {
+  color: var(--gold-soft);
+  text-shadow: 0 0 8px rgba(252, 196, 19, 0.34);
+}
+
+.progress__track {
+  border: 0;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(226, 222, 211, 0.2);
+}
+
+.progress__fill {
+  background: linear-gradient(90deg, var(--hud-blue-dark), var(--hud-blue-glow), var(--ink));
+  box-shadow: var(--hud-blue-aura);
+}
+
+.prompt-panel,
+.question-system {
+  background:
+    radial-gradient(circle at 10% 8%, rgba(60, 211, 252, 0.12), transparent 13rem),
+    linear-gradient(180deg, rgba(255, 253, 228, 0.035), rgba(255, 253, 228, 0.006)),
+    rgba(4, 8, 13, 0.76);
+  box-shadow: var(--shadow), 0 0 18px rgba(60, 211, 252, 0.12);
+}
+
+.prompt-panel::after,
+.question-system::after {
+  border-color: rgba(60, 211, 252, 0.36);
+}
+
+.section-heading h2,
+.app-header h1,
+.case-title-block h1,
+.result-header h1 {
+  color: var(--ink);
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.86), 0 0 10px rgba(226, 222, 211, 0.16);
+}
+
+.localized-text__en {
+  color: var(--ink);
+  font-style: italic;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.72);
+}
+
+.localized-text__zh {
+  color: rgba(233, 225, 209, 0.66);
+}
+
+.word-token {
+  border-radius: 2px;
+  color: inherit;
+  text-decoration: underline dotted rgba(60, 211, 252, 0.42);
+  text-underline-offset: 3px;
+}
+
+.word-token:hover {
+  color: var(--hud-blue);
+  background: rgba(60, 211, 252, 0.1);
+  text-shadow: 0 0 8px rgba(79, 192, 255, 0.72);
+}
+
+.button {
+  border: 0;
+  border-radius: 4px;
+  font-style: italic;
+}
+
+.button--primary {
+  color: #0d0b06;
+  background: linear-gradient(180deg, rgba(255, 219, 126, 0.9), rgba(252, 196, 19, 0.62));
+  box-shadow: var(--hud-gold-aura);
+}
+
+.button--primary:disabled {
+  color: rgba(0, 0, 0, 0.72);
+  background: linear-gradient(180deg, rgba(252, 196, 19, 0.54), rgba(115, 91, 44, 0.72));
+  box-shadow: none;
+}
+
+.button--secondary,
+.button--ghost,
+.button--note {
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.56);
+}
+
+.button--question {
+  min-height: 64px;
+  border: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(60, 211, 252, 0.09), transparent 24%),
+    rgba(0, 0, 0, 0.62);
+}
+
+.button--question::after {
+  border-color: rgba(226, 222, 211, 0.22);
+}
+
+.button--question:hover {
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(60, 211, 252, 0.16), transparent 36%),
+    rgba(0, 0, 0, 0.76);
+  box-shadow: var(--hud-menu-aura);
+}
+
+.button--question:hover::after,
+.truth-choice:hover::after,
+.case-card.is-active:hover::after {
+  border-color: rgba(226, 222, 211, 0.72);
+  box-shadow: inset 0 0 7px 3px rgba(246, 231, 152, 0.18);
+}
+
+.button svg,
+.mobile-case-nav svg,
+.icon-button svg {
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.deduction-cta {
+  border-top-color: rgba(226, 222, 211, 0.14);
+}
+
+.mobile-case-nav {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 4px 4px 0 0;
+  background:
+    linear-gradient(90deg, rgba(60, 211, 252, 0.09), transparent, rgba(252, 196, 19, 0.06)),
+    rgba(0, 0, 0, 0.84);
+  box-shadow: var(--shadow), var(--hud-blue-aura);
+}
+
+.mobile-case-nav::after {
+  border-color: rgba(226, 222, 211, 0.34);
+}
+
+.mobile-case-nav button {
+  border-radius: 4px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.mobile-case-nav button:hover {
+  color: var(--hud-blue);
+  background: rgba(60, 211, 252, 0.08);
+  text-shadow: 0 0 8px rgba(79, 192, 255, 0.6);
+}
+
+.modal-shell {
+  background:
+    radial-gradient(circle at 50% 78%, rgba(60, 211, 252, 0.12), transparent 25rem),
+    rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  border: 0;
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, rgba(60, 211, 252, 0.1), transparent 24%, transparent 78%, rgba(252, 196, 19, 0.08)),
+    rgba(3, 8, 12, 0.94);
+  box-shadow: var(--shadow), var(--hud-wide-aura);
+}
+
+.modal::after {
+  border-color: rgba(226, 222, 211, 0.58);
+  box-shadow: inset 0 0 8px 2px rgba(60, 211, 252, 0.12);
+}
+
+.word-detail__headline strong,
+.word-detail__extras h3,
+.nick-dialogue .nick-level,
+.case-file-tabs button.is-active,
+.truth-choice.is-active {
+  color: var(--gold-soft);
+  text-shadow: 0 0 8px rgba(252, 196, 19, 0.38);
+}
+
+.word-detail__meaning span {
+  color: var(--ink);
+}
+
+.case-file-tabs {
+  border: 0;
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.case-file-tabs button {
+  border-radius: 4px;
+  font-style: italic;
+}
+
+.case-file-tabs button.is-active {
+  background: rgba(226, 222, 211, 0.12);
+  box-shadow: var(--hud-menu-aura);
+}
+
+.truth-choice {
+  border: 0;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.truth-choice.is-active {
+  background: rgba(226, 222, 211, 0.12);
+  box-shadow: var(--hud-menu-aura);
+}
+
+.truth-feedback.is-correct,
+.new-clue-callout {
+  border: 0;
+  background: rgba(23, 58, 40, 0.72);
+}
+
+.truth-feedback.is-wrong {
+  border: 0;
+  background: rgba(72, 18, 18, 0.72);
+}
+
+.clues li.is-unlocked::after,
+.truth-feedback.is-correct::after,
+.new-clue-callout::after {
+  border-color: rgba(111, 212, 156, 0.58);
+}
+
+.truth-feedback.is-wrong::after {
+  border-color: rgba(241, 80, 80, 0.58);
+}
+
+.case-card {
+  background:
+    radial-gradient(circle at 84% 12%, rgba(60, 211, 252, 0.12), transparent 8rem),
+    linear-gradient(135deg, rgba(226, 222, 211, 0.05), transparent 44%),
+    rgba(0, 0, 0, 0.62);
+}
+
+.case-card.is-active:hover {
+  box-shadow: var(--shadow), var(--hud-wide-aura);
+}
+
+.badge {
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 960px) {
+  .mobile-case-nav {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    opacity: 0.35;
+  }
+}
