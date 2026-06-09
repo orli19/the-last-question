@@ -28,14 +28,7 @@ export function getWordEntry(word, vocabularyLookup) {
     };
   }
 
-  return {
-    id: `ordinary_${normalized}`,
-    word,
-    phonetic: "Not listed",
-    partOfSpeech: "Word",
-    zh: "未收录为重点词",
-    isFocusWord: false
-  };
+  return null;
 }
 
 export function ClickableText({ children, onWordClick, vocabularyLookup }) {
@@ -52,16 +45,22 @@ export function ClickableText({ children, onWordClick, vocabularyLookup }) {
     }
 
     const entry = getWordEntry(match, vocabularyLookup);
-    parts.push(
-      <button
-        className={entry.isFocusWord ? "word-token is-focus-word" : "word-token"}
-        key={`${match}-${index}`}
-        type="button"
-        onClick={() => onWordClick(entry)}
-      >
-        {match}
-      </button>
-    );
+
+    if (entry) {
+      parts.push(
+        <button
+          className="word-token is-focus-word"
+          key={`${match}-${index}`}
+          type="button"
+          onClick={() => onWordClick(entry)}
+        >
+          {match}
+        </button>
+      );
+    } else {
+      parts.push(match);
+    }
+
     lastIndex = index + match.length;
     return match;
   });

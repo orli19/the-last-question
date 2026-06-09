@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
 const introLines = [
-  "A new case",
-  "awaits investigation.",
+  "A new case awaits.",
+  "",
   "Ask questions.",
-  "Collect clues.",
-  "Consult your assistant.",
+  "Follow clues.",
   "Find the truth.",
-  "What really happened?",
+  "Every answer reveals another mystery.",
+  "Every clue changes the story.",
 ];
 
 const COPY_VISIBLE_DELAY = 2200;
@@ -64,8 +64,8 @@ export function OpeningPage({ onBegin }) {
             className={["opening-copy", isCopyVisible ? "is-visible" : ""].filter(Boolean).join(" ")}
             aria-label={introLines.join(" ")}
           >
-            {introLines.map((line) => (
-              <p key={line}>
+            {introLines.map((line, index) => (
+              <p className={line ? "" : "is-spacer"} key={`${index}-${line || "spacer"}`}>
                 <span>{line}</span>
               </p>
             ))}
@@ -77,7 +77,7 @@ export function OpeningPage({ onBegin }) {
             disabled={!isReady || isLeaving}
             onClick={handleBegin}
           >
-            Begin Investigation
+            Investigation
           </button>
         </div>
       </section>

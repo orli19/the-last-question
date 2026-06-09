@@ -1,6 +1,3 @@
-import { ArrowRight, FilePlus2 } from "lucide-react";
-import { Button } from "../ui/Button.jsx";
-import { Modal } from "../ui/Modal.jsx";
 import { LocalizedText } from "./LocalizedText.jsx";
 
 export function InvestigationResultModal({
@@ -13,46 +10,44 @@ export function InvestigationResultModal({
 }) {
   const newClues = entry?.newClues ?? [];
 
+  if (!isOpen || !entry) {
+    return null;
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Investigation Result">
-      {entry ? (
-        <div className="investigation-result">
-          <section>
-            <p className="eyebrow">Question</p>
-            <LocalizedText
-              value={entry.question.text}
-              languageMode={languageMode}
-              onWordClick={onWordClick}
-              vocabularyLookup={vocabularyLookup}
-            />
-          </section>
-          <section>
-            <p className="eyebrow">Answer</p>
-            <LocalizedText
-              value={entry.question.answer}
-              languageMode={languageMode}
-              onWordClick={onWordClick}
-              vocabularyLookup={vocabularyLookup}
-            />
-          </section>
-          {newClues.length > 0 ? (
-            <div className="new-clue-callout is-unlocked">
-              <FilePlus2 aria-hidden="true" size={18} />
-              <div>
-                <strong>New Clue Added To Case File</strong>
-                <span>
-                  {newClues.length} {newClues.length === 1 ? "clue" : "clues"} added
-                </span>
-              </div>
-            </div>
-          ) : null}
-          <div className="modal-actions">
-            <Button icon={ArrowRight} onClick={onClose}>
-              Continue
-            </Button>
-          </div>
+    <section
+      aria-label="Nick answer"
+      aria-modal="false"
+      className="nick-answer-sheet is-entering"
+      role="dialog"
+    >
+      <span className="nick-answer-corner nick-answer-corner--tl" aria-hidden="true" />
+      <span className="nick-answer-corner nick-answer-corner--tr" aria-hidden="true" />
+      <span className="nick-answer-corner nick-answer-corner--br" aria-hidden="true" />
+      <span className="nick-answer-corner nick-answer-corner--bl" aria-hidden="true" />
+
+      {newClues.length > 0 ? (
+        <div className="nick-new-clue-stamp" aria-label="New clue evidence added">
+          NEW CLUE
         </div>
       ) : null}
-    </Modal>
+
+      <div className="nick-answer-header">
+        <strong>Detective Nick</strong>
+      </div>
+
+      <div className="nick-answer-copy">
+        <LocalizedText
+          value={entry.question.answer}
+          languageMode={languageMode}
+          onWordClick={onWordClick}
+          vocabularyLookup={vocabularyLookup}
+        />
+      </div>
+
+      <button className="nick-answer-continue" type="button" onClick={onClose}>
+        CONTINUE &gt;
+      </button>
+    </section>
   );
 }

@@ -1,5 +1,5 @@
 import { ArrowLeft, FolderOpen, MessageCircle } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnswerLog } from "../components/game/AnswerLog.jsx";
 import { AskNickModal } from "../components/game/AskNickModal.jsx";
 import { createVocabularyLookup } from "../components/game/ClickableText.jsx";
@@ -12,16 +12,14 @@ import { QuestionSystem } from "../components/game/QuestionSystem.jsx";
 import { SubmitTruthModal } from "../components/game/SubmitTruthModal.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Modal } from "../components/ui/Modal.jsx";
-import { ProgressBar } from "../components/ui/ProgressBar.jsx";
 import {
   canMakeDeduction,
   getDemoQuestionPool,
-  getProgress,
   getUnlockedClues
 } from "../services/gameEngine.js";
 
 export function CasePage({ caseData, onBack, onSolved }) {
-  const [languageMode, setLanguageMode] = useState("bilingual");
+  const [languageMode, setLanguageMode] = useState("english");
   const [activeWord, setActiveWord] = useState(null);
   const [activeResult, setActiveResult] = useState(null);
   const [caseFileTab, setCaseFileTab] = useState("clues");
@@ -31,23 +29,29 @@ export function CasePage({ caseData, onBack, onSolved }) {
   const [nickIntroduced, setNickIntroduced] = useState(false);
   const [selectedChoiceId, setSelectedChoiceId] = useState(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState(() => new Set());
+  const [investigatingQuestionId, setInvestigatingQuestionId] = useState(null);
   const [answers, setAnswers] = useState([]);
+  const investigationTimerRef = useRef(null);
 
   const questionPool = useMemo(() => getDemoQuestionPool(caseData), [caseData]);
   const clues = useMemo(() => getUnlockedClues(caseData, usedQuestionIds), [caseData, usedQuestionIds]);
-  const progress = useMemo(
-    () => getProgress(caseData, usedQuestionIds, false, questionPool),
-    [caseData, questionPool, usedQuestionIds]
-  );
   const vocabularyLookup = useMemo(() => createVocabularyLookup(caseData.vocabulary), [caseData.vocabulary]);
   const visibleQuestions = useMemo(
-    () => questionPool.filter((question) => !usedQuestionIds.has(question.id)).slice(0, 4),
-    [questionPool, usedQuestionIds]
+    () => questionPool.slice(0, 4),
+    [questionPool]
   );
   const deductionReady = canMakeDeduction(caseData, usedQuestionIds, questionPool);
 
+  useEffect(() => {
+    return () => {
+      if (investigationTimerRef.current) {
+        window.clearTimeout(investigationTimerRef.current);
+      }
+    };
+  }, []);
+
   function askQuestion(question) {
-    if (usedQuestionIds.has(question.id)) {
+    if (investigatingQuestionId || activeResult) {
       return;
     }
 
@@ -55,15 +59,29 @@ export function CasePage({ caseData, onBack, onSolved }) {
     const newClues = (caseData.clues ?? []).filter(
       (clue) => (question.unlockClues ?? []).includes(clue.id) && !unlockedBefore.has(clue.id)
     );
-    const entry = { question, askedAt: Date.now(), newClues };
+    const existingEntry = answers.find((answer) => answer.question.id === question.id);
+    const entry = existingEntry
+      ? { ...existingEntry, askedAt: Date.now(), newClues: [] }
+      : { question, askedAt: Date.now(), newClues };
 
-    setUsedQuestionIds((current) => {
-      const next = new Set(current);
-      next.add(question.id);
-      return next;
-    });
-    setAnswers((current) => [...current, entry]);
-    setActiveResult(entry);
+    setInvestigatingQuestionId(question.id);
+    investigationTimerRef.current = window.setTimeout(() => {
+      setInvestigatingQuestionId(null);
+      setActiveResult(entry);
+    }, 500);
+  }
+
+  function closeInvestigationResult() {
+    if (activeResult && !usedQuestionIds.has(activeResult.question.id)) {
+      setUsedQuestionIds((current) => {
+        const next = new Set(current);
+        next.add(activeResult.question.id);
+        return next;
+      });
+      setAnswers((current) => [...current, activeResult]);
+    }
+
+    setActiveResult(null);
   }
 
   function openTruthModal() {
@@ -82,7 +100,6 @@ export function CasePage({ caseData, onBack, onSolved }) {
           <ArrowLeft aria-hidden="true" size={24} strokeWidth={2.4} />
         </button>
         <LanguageToggle languageMode={languageMode} onChange={setLanguageMode} />
-        <ProgressBar value={progress} />
       </header>
 
       <div className="case-layout">
@@ -100,6 +117,7 @@ export function CasePage({ caseData, onBack, onSolved }) {
               onAskQuestion={askQuestion}
               onMakeDeduction={openTruthModal}
               onWordClick={setActiveWord}
+              investigatingQuestionId={investigatingQuestionId}
               questionCount={questionPool.length}
               usedQuestionIds={usedQuestionIds}
               visibleQuestions={visibleQuestions}
@@ -127,6 +145,10 @@ export function CasePage({ caseData, onBack, onSolved }) {
         </aside>
       </div>
 
+      <div className="case-terminal-footer" aria-label="Case information">
+        CASE 01 <span aria-hidden="true">|</span> THE RETURNED BOOK
+      </div>
+
       <nav className="mobile-case-nav" aria-label="Investigation tools">
         <button type="button" onClick={() => setIsCaseFileOpen(true)}>
           <FolderOpen aria-hidden="true" size={19} />
@@ -142,7 +164,7 @@ export function CasePage({ caseData, onBack, onSolved }) {
         entry={activeResult}
         isOpen={Boolean(activeResult)}
         languageMode={languageMode}
-        onClose={() => setActiveResult(null)}
+        onClose={closeInvestigationResult}
         onWordClick={setActiveWord}
         vocabularyLookup={vocabularyLookup}
       />

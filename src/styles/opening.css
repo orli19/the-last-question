@@ -3,7 +3,8 @@
   display: grid;
   min-height: 100vh;
   min-height: 100svh;
-  place-items: center;
+  justify-items: center;
+  align-items: center;
   overflow: hidden;
   padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
   background:
@@ -93,8 +94,11 @@
 
 .opening-panel {
   position: relative;
-  width: min(100%, 620px);
-  max-height: calc(100svh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display: grid;
+  width: min(100%, 480px);
+  min-height: clamp(600px, 86svh, 680px);
+  max-height: calc(100svh - 44px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin-top: calc(clamp(10px, 3vh, 28px) * -1);
   overflow: hidden;
   border: 1px solid rgb(231 225 205 / 30%);
   border-radius: 4px;
@@ -133,8 +137,10 @@
 .opening-panel__inner {
   position: relative;
   display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
   justify-items: center;
-  padding: clamp(22px, 5.4vh, 46px) clamp(20px, 6vw, 58px) clamp(24px, 5vh, 46px);
+  min-height: 100%;
+  padding: clamp(30px, 6.2vh, 56px) clamp(22px, 6vw, 54px) clamp(42px, 8vh, 68px);
   text-align: center;
 }
 
@@ -199,11 +205,14 @@
 }
 
 .opening-panel h1 {
-  margin: 0;
+  width: min(70vw, 360px);
+  max-width: calc(100% - 40px);
+  margin: 0 auto;
   color: #fffde4;
-  font-size: clamp(2rem, 10vw, 4.8rem);
-  line-height: 0.92;
+  font-size: clamp(1.58rem, 7.75vw, 3.25rem);
+  line-height: 0.96;
   letter-spacing: 0;
+  text-align: center;
   text-shadow:
     0 0 16px rgb(0 0 0 / 86%),
     0 0 24px rgb(73 197 255 / 30%);
@@ -213,7 +222,8 @@
 }
 
 .opening-divider {
-  width: min(100%, 440px);
+  width: min(70vw, 360px);
+  max-width: calc(100% - 40px);
   height: 14px;
   margin: clamp(14px, 3vh, 24px) 0 clamp(12px, 2.8vh, 22px);
   background:
@@ -226,8 +236,9 @@
 
 .opening-copy {
   display: grid;
-  gap: clamp(6px, 1.4vh, 10px);
-  width: 100%;
+  align-self: center;
+  gap: clamp(6px, 1.35vh, 11px);
+  width: min(100%, 360px);
   min-width: 0;
   color: rgb(255 253 228 / 92%);
   font-size: clamp(0.88rem, 3.45vw, 1.08rem);
@@ -248,8 +259,12 @@
 .opening-copy p {
   display: flex;
   justify-content: center;
-  min-height: 1.32em;
+  min-height: 1.28em;
   margin: 0;
+}
+
+.opening-copy p.is-spacer {
+  min-height: clamp(8px, 1.8vh, 14px);
 }
 
 .opening-copy span {
@@ -258,9 +273,12 @@
 }
 
 .opening-begin {
-  min-width: min(100%, 260px);
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  min-width: min(100%, 220px);
   min-height: 48px;
-  margin-top: clamp(18px, 4vh, 34px);
+  margin-top: clamp(28px, 5.8vh, 48px);
   border: 1px solid rgb(246 214 124 / 72%);
   border-radius: 4px;
   padding: 12px 22px;
@@ -287,6 +305,19 @@
     background 180ms ease;
 }
 
+.opening-begin::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    0 0 14px rgb(246 214 124 / 0%),
+    0 0 24px rgb(73 197 255 / 0%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .opening-begin.is-visible {
   opacity: 1;
   transform: translateY(0);
@@ -294,6 +325,10 @@
 
 .opening-begin:not(:disabled) {
   pointer-events: auto;
+}
+
+.opening-begin.is-visible:not(:disabled)::after {
+  animation: openingButtonBreathe 2.8s ease-in-out infinite;
 }
 
 .opening-begin:not(:disabled):hover {
@@ -359,30 +394,62 @@
   }
 }
 
+@keyframes openingButtonBreathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgb(246 214 124 / 14%),
+      0 0 18px rgb(73 197 255 / 6%);
+    opacity: 0.52;
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgb(246 214 124 / 34%),
+      0 0 30px rgb(73 197 255 / 15%);
+    opacity: 0.86;
+  }
+}
+
 @media (max-width: 420px) {
+  .opening-panel {
+    width: min(100%, 350px);
+    min-height: min(76svh, 640px);
+    max-height: calc(100svh - 42px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
   .opening-panel__inner {
-    padding: 20px 18px 22px;
+    padding: 28px 20px 42px;
+  }
+
+  .opening-panel h1 {
+    font-size: clamp(1.7rem, 8.45vw, 2.15rem);
   }
 
   .opening-copy {
-    font-size: clamp(0.78rem, 3.35vw, 0.9rem);
-    gap: 5px;
+    width: min(100%, 292px);
+    font-size: clamp(0.76rem, 3.2vw, 0.86rem);
+    gap: 4px;
   }
 
   .opening-begin {
+    min-width: min(100%, 198px);
     min-height: 46px;
-    margin-top: 16px;
+    margin-top: 30px;
   }
 }
 
 @media (max-height: 700px) {
+  .opening-panel {
+    min-height: min(82svh, 610px);
+  }
+
   .opening-panel__inner {
-    padding-top: 18px;
-    padding-bottom: 18px;
+    padding-top: 24px;
+    padding-bottom: 38px;
   }
 
   .opening-panel h1 {
-    font-size: clamp(1.72rem, 8.5vw, 3.1rem);
+    font-size: clamp(1.46rem, 7vw, 2.74rem);
   }
 
   .opening-divider {
@@ -391,13 +458,13 @@
 
   .opening-copy {
     gap: 4px;
-    font-size: clamp(0.76rem, 2.9vh, 0.96rem);
+    font-size: clamp(0.74rem, 2.6vh, 0.92rem);
     line-height: 1.2;
   }
 
   .opening-begin {
     min-height: 44px;
-    margin-top: 14px;
+    margin-top: 24px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
@@ -410,9 +477,11 @@
   .opening-kicker,
   .opening-panel h1,
   .opening-divider,
-  .opening-begin {
+  .opening-begin,
+  .opening-begin.is-visible:not(:disabled)::after {
     animation-duration: 1ms;
     animation-delay: 0ms;
+    animation-iteration-count: 1;
   }
 
   .opening-copy,

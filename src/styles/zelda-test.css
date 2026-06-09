@@ -295,8 +295,7 @@ a:focus-visible {
 .word-token {
   border-radius: 2px;
   color: inherit;
-  text-decoration: underline dotted rgba(60, 211, 252, 0.42);
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 
 .word-token:hover {
