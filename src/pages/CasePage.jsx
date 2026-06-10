@@ -13,12 +13,11 @@ import { SubmitTruthModal } from "../components/game/SubmitTruthModal.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Modal } from "../components/ui/Modal.jsx";
 import {
-  canMakeDeduction,
-  getDemoQuestionPool,
+  getAllQuestions,
   getUnlockedClues
 } from "../services/gameEngine.js";
 
-export function CasePage({ caseData, onBack, onSolved }) {
+export function CasePage({ caseData, onArchiveSolved, onBack }) {
   const [languageMode, setLanguageMode] = useState("english");
   const [activeWord, setActiveWord] = useState(null);
   const [activeResult, setActiveResult] = useState(null);
@@ -33,14 +32,19 @@ export function CasePage({ caseData, onBack, onSolved }) {
   const [answers, setAnswers] = useState([]);
   const investigationTimerRef = useRef(null);
 
-  const questionPool = useMemo(() => getDemoQuestionPool(caseData), [caseData]);
+  const questionPool = useMemo(() => getAllQuestions(caseData), [caseData]);
   const clues = useMemo(() => getUnlockedClues(caseData, usedQuestionIds), [caseData, usedQuestionIds]);
   const vocabularyLookup = useMemo(() => createVocabularyLookup(caseData.vocabulary), [caseData.vocabulary]);
-  const visibleQuestions = useMemo(
-    () => questionPool.slice(0, 4),
-    [questionPool]
+  const visibleQuestions = questionPool;
+  const currentRoundClueIds = useMemo(
+    () => new Set(visibleQuestions.flatMap((question) => question.unlockClues ?? [])),
+    [visibleQuestions]
   );
-  const deductionReady = canMakeDeduction(caseData, usedQuestionIds, questionPool);
+  const unlockedClueIds = useMemo(() => new Set(clues.map((clue) => clue.id)), [clues]);
+  const currentRoundComplete =
+    visibleQuestions.length > 0 && visibleQuestions.every((question) => usedQuestionIds.has(question.id));
+  const currentRoundCluesFound = [...currentRoundClueIds].every((clueId) => unlockedClueIds.has(clueId));
+  const deductionReady = currentRoundComplete && currentRoundCluesFound;
 
   useEffect(() => {
     return () => {
@@ -146,8 +150,16 @@ export function CasePage({ caseData, onBack, onSolved }) {
       </div>
 
       <div className="case-terminal-footer" aria-label="Case information">
-        CASE 01 <span aria-hidden="true">|</span> THE RETURNED BOOK
+        {caseData.caseNumber.toUpperCase()} <span aria-hidden="true">|</span> {caseData.title.en.toUpperCase()}
       </div>
+
+      {deductionReady && !activeResult && !isTruthOpen ? (
+        <div className="case-deduction-dock">
+          <Button className="case-deduction-button" onClick={openTruthModal}>
+            Make Deduction
+          </Button>
+        </div>
+      ) : null}
 
       <nav className="mobile-case-nav" aria-label="Investigation tools">
         <button type="button" onClick={() => setIsCaseFileOpen(true)}>
@@ -221,8 +233,8 @@ export function CasePage({ caseData, onBack, onSolved }) {
         caseData={caseData}
         isOpen={isTruthOpen}
         languageMode={languageMode}
+        onBackToArchive={onArchiveSolved}
         onClose={() => setIsTruthOpen(false)}
-        onSolved={onSolved}
         selectedChoiceId={selectedChoiceId}
         setSelectedChoiceId={setSelectedChoiceId}
       />

@@ -1,67 +1,144 @@
-import { CheckCircle2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { checkFinalChoice } from "../../services/gameEngine.js";
-import { Button } from "../ui/Button.jsx";
-import { Modal } from "../ui/Modal.jsx";
 import { LocalizedText } from "./LocalizedText.jsx";
 
 export function SubmitTruthModal({
   caseData,
   isOpen,
   languageMode,
+  onBackToArchive,
   onClose,
-  onSolved,
   selectedChoiceId,
   setSelectedChoiceId
 }) {
-  const selectedChoice = (caseData.finalChoices ?? []).find((choice) => choice.id === selectedChoiceId);
+  const [wrongChoiceId, setWrongChoiceId] = useState(null);
+  const [isSolved, setIsSolved] = useState(false);
+  const wrongTimerRef = useRef(null);
+  const choices = useMemo(() => (caseData.finalChoices ?? []).slice(0, 4), [caseData.finalChoices]);
+  const selectedChoice = choices.find((choice) => choice.id === selectedChoiceId);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setWrongChoiceId(null);
+    setIsSolved(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (wrongTimerRef.current) {
+        window.clearTimeout(wrongTimerRef.current);
+      }
+    };
+  }, []);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  function markWrong(choiceId) {
+    setWrongChoiceId(null);
+    if (wrongTimerRef.current) {
+      window.clearTimeout(wrongTimerRef.current);
+    }
+
+    wrongTimerRef.current = window.setTimeout(() => {
+      setWrongChoiceId(choiceId);
+    }, 0);
+  }
+
+  function resolveChoice(choice) {
+    setSelectedChoiceId(choice.id);
+
+    if (checkFinalChoice(choice)) {
+      if (wrongTimerRef.current) {
+        window.clearTimeout(wrongTimerRef.current);
+      }
+      setWrongChoiceId(null);
+      setIsSolved(true);
+      return;
+    }
+
+    setIsSolved(false);
+    markWrong(choice.id);
+  }
 
   function submitChoice() {
     if (!selectedChoice) {
       return;
     }
 
-    if (checkFinalChoice(selectedChoice)) {
-      onSolved();
-    }
+    resolveChoice(selectedChoice);
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="What Really Happened?">
-      <div className="truth-options">
-        {(caseData.finalChoices ?? []).map((choice) => {
-          const isSelected = selectedChoiceId === choice.id;
-          const isWrongSelected = isSelected && selectedChoice && !selectedChoice.isCorrect;
-          return (
-            <button
-              key={choice.id}
-              className={[
-                "truth-choice",
-                isSelected ? "is-active" : "",
-                isWrongSelected ? "is-wrong" : ""
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              type="button"
-              onClick={() => setSelectedChoiceId(choice.id)}
-            >
-              <LocalizedText value={choice.text} languageMode={languageMode} />
-            </button>
-          );
-        })}
-      </div>
-      {selectedChoice ? (
-        <div className={["truth-feedback", selectedChoice.isCorrect ? "is-correct" : "is-wrong"].join(" ")}>
-          <LocalizedText value={selectedChoice.feedback} languageMode={languageMode} />
+    <>
+      {isSolved ? <div className="case-solved-stamp">CASE SOLVED</div> : null}
+      <section
+        aria-label="Final deduction"
+        aria-modal="false"
+        className={["final-deduction-sheet", isSolved ? "is-solved" : ""].filter(Boolean).join(" ")}
+        role="dialog"
+      >
+        <span className="final-deduction-corner final-deduction-corner--tl" aria-hidden="true" />
+        <span className="final-deduction-corner final-deduction-corner--tr" aria-hidden="true" />
+        <span className="final-deduction-corner final-deduction-corner--br" aria-hidden="true" />
+        <span className="final-deduction-corner final-deduction-corner--bl" aria-hidden="true" />
+
+        <header className="final-deduction-header">
+          <p>FINAL DEDUCTION</p>
+          <span>Tell Nick what really happened.</span>
+        </header>
+
+        <div className="truth-options final-deduction-options">
+          {choices.map((choice) => {
+            const isSelected = selectedChoiceId === choice.id;
+            const isCorrectSelected = isSolved && isSelected && choice.isCorrect;
+            const isWrongSelected = wrongChoiceId === choice.id;
+
+            return (
+              <button
+                key={choice.id}
+                className={[
+                  "truth-choice",
+                  "final-deduction-choice",
+                  isSelected ? "is-active" : "",
+                  isCorrectSelected ? "is-correct" : "",
+                  isWrongSelected ? "is-wrong" : ""
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                type="button"
+                onClick={() => resolveChoice(choice)}
+              >
+                <LocalizedText value={choice.text} languageMode={languageMode} />
+              </button>
+            );
+          })}
         </div>
-      ) : null}
-      <div className="modal-actions">
-        <Button variant="ghost" onClick={onClose}>
-          Keep Investigating
-        </Button>
-        <Button icon={CheckCircle2} disabled={!selectedChoice} onClick={submitChoice}>
-          Make Deduction
-        </Button>
-      </div>
-    </Modal>
+
+        {isSolved ? (
+          <div className="final-deduction-actions">
+            <button type="button" onClick={onBackToArchive}>
+              [ BACK TO ARCHIVE ]
+            </button>
+            <button type="button" onClick={onClose}>
+              [ REVIEW CASE ]
+            </button>
+          </div>
+        ) : (
+          <button
+            className="final-deduction-submit"
+            disabled={!selectedChoice}
+            type="button"
+            onClick={submitChoice}
+          >
+            Submit Deduction
+          </button>
+        )}
+      </section>
+    </>
   );
 }

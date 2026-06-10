@@ -28,14 +28,6 @@ function formatCaseNumber(caseNumber) {
   return caseNumber.replace(/^Case/i, "CASE");
 }
 
-function getCaseHookLines(caseItem) {
-  if (caseItem.id === "case001") {
-    return ["A book was returned.", "No one remembered borrowing it."];
-  }
-
-  return caseItem.prompt?.en?.slice(0, 2) ?? [caseItem.summary?.en ?? "Evidence waits in the dark."];
-}
-
 function formatCaseMeta(caseItem) {
   return `${caseItem.vocabularyLevel} · ${caseItem.difficulty} · ${caseItem.estimatedTime}`;
 }
@@ -223,15 +215,10 @@ export function HomePage({ cases, solvedCaseId, onStartCase }) {
 
               <h2>{title}</h2>
               <p className="case-card__zh">{caseItem.title.zh}</p>
-              <p className="case-card__hook">
-                {getCaseHookLines(caseItem).map((line, lineIndex, hookLines) => (
-                  <span key={line}>
-                    {lineIndex === 0 ? '"' : ""}
-                    {line}
-                    {lineIndex === hookLines.length - 1 ? '"' : ""}
-                  </span>
-                ))}
-              </p>
+              <div className="case-card__hook">
+                <span>Summary: {caseItem.summary.en}</span>
+                <span>{caseItem.summary.zh}</span>
+              </div>
 
               <Button
                 className="case-open-button"

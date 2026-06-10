@@ -19,20 +19,20 @@ const introSlides = [
 ];
 
 function getNickHint(answerCount, clueCount) {
-  if (clueCount >= 8) {
+  if (clueCount >= 4) {
     return [
       "Level 3",
-      "If the police did not find the book,",
-      "why did it appear six months later?",
+      "The restaurant soup was real.",
+      "So ask what the old soup could not have been.",
       "I support bold reasoning. Not baseless guessing."
     ];
   }
 
-  if (clueCount >= 4) {
+  if (clueCount >= 2) {
     return [
       "Level 2",
-      "The borrower is already dead.",
-      "So who returned the book?",
+      "The shipwreck matters.",
+      "That is where the lie began.",
       "That is not a rhetorical question."
     ];
   }
@@ -40,16 +40,16 @@ function getNickHint(answerCount, clueCount) {
   if (answerCount >= 3) {
     return [
       "Level 1",
-      "You seem very interested in the book itself.",
-      "Try paying attention to the borrower.",
+      "You seem very interested in the soup itself.",
+      "Try asking where his memory of the taste came from.",
       "The clue will not multiply just because you stare at it."
     ];
   }
 
   return [
     "Level 1",
-    "The book itself does not seem important.",
-    "The person who borrowed it probably is.",
+    "The soup is not the weapon.",
+    "It is a comparison.",
     "A neat little trap, if you are willing to notice it."
   ];
 }

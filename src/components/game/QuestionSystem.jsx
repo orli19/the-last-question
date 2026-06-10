@@ -5,20 +5,36 @@ import { LocalizedText } from "./LocalizedText.jsx";
 
 const initialQuestionLabels = [
   {
-    en: "Who returned the book?",
-    zh: "是谁归还了这本书？"
+    en: "Was the soup poisonous?",
+    zh: "这碗汤有毒吗？"
   },
   {
-    en: "What was unusual about the book?",
-    zh: "这本书有什么异常？"
+    en: "Did the man know what turtle soup tasted like?",
+    zh: "这个男人以前知道海龟汤是什么味道吗？"
   },
   {
-    en: "Why did the librarian call the police so quickly?",
-    zh: "为什么图书管理员这么快就报了警？"
+    en: "Was this his first time ordering turtle soup in a restaurant?",
+    zh: "这是他第一次在餐厅点海龟汤吗？"
   },
   {
-    en: "What happened right before the book was returned?",
-    zh: "这本书被归还前发生了什么？"
+    en: "Had he once survived a disaster at sea?",
+    zh: "他曾经在海难中幸存下来吗？"
+  },
+  {
+    en: "Was he once stranded with other people?",
+    zh: "他当时是和其他人一起被困的吗？"
+  },
+  {
+    en: "Did someone lie to him during that disaster?",
+    zh: "在那场灾难中，有人对他说谎了吗？"
+  },
+  {
+    en: "Was the soup he tasted in the restaurant different from what he remembered?",
+    zh: "餐厅里的海龟汤和他记忆中的味道不同吗？"
+  },
+  {
+    en: "Did he realize that what he ate before was not turtle soup?",
+    zh: "他意识到自己以前吃的并不是海龟汤了吗？"
   }
 ];
 

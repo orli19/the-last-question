@@ -13,7 +13,7 @@ export function LanguageToggle({ languageMode, onChange }) {
         type="button"
         onClick={() => onChange("bilingual")}
       >
-        BI
+        中
       </button>
     </div>
   );

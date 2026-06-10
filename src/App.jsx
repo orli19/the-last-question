@@ -29,6 +29,11 @@ export default function App() {
     setRoute({ name: "result", caseId });
   }
 
+  function archiveSolvedCase(caseId) {
+    setSolvedCaseId(caseId);
+    setRoute(initialRoute);
+  }
+
   if (!hasEnteredOpening) {
     return <OpeningPage onBegin={() => setHasEnteredOpening(true)} />;
   }
@@ -38,6 +43,7 @@ export default function App() {
       <CasePage
         caseData={activeCase}
         onBack={goHome}
+        onArchiveSolved={() => archiveSolvedCase(activeCase.id)}
         onSolved={() => showResult(activeCase.id)}
       />
     );
