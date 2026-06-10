@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { checkFinalChoice } from "../../services/gameEngine.js";
+import { playCaseClose, playWrongAnswer } from "../../services/audioManager.js";
 import { LocalizedText } from "./LocalizedText.jsx";
 
 export function SubmitTruthModal({
@@ -57,11 +58,13 @@ export function SubmitTruthModal({
         window.clearTimeout(wrongTimerRef.current);
       }
       setWrongChoiceId(null);
+      playCaseClose();
       setIsSolved(true);
       return;
     }
 
     setIsSolved(false);
+    playWrongAnswer();
     markWrong(choice.id);
   }
 

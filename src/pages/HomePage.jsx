@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { Button } from "../components/ui/Button.jsx";
 import { Card } from "../components/ui/Card.jsx";
+import { playSound } from "../services/audioManager.js";
 
 const archiveSlots = [
   {
@@ -170,6 +171,7 @@ export function HomePage({ cases, solvedCaseId, onStartCase }) {
       return;
     }
 
+    playSound("click");
     setOpeningCaseId(archiveId);
     window.setTimeout(() => onStartCase(caseId), 420);
   }

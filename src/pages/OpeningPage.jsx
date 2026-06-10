@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+import { playSound, setAudioMuted, startOpeningBgm, stopOpeningBgm } from "../services/audioManager.js";
 
 const introLines = [
   "A new case awaits.",
@@ -20,8 +22,10 @@ export function OpeningPage({ onBegin }) {
   const [isLeaving, setIsLeaving] = useState(false);
   const [isCopyVisible, setIsCopyVisible] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(false);
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
 
   useEffect(() => {
+    setAudioMuted(true);
     const copyTimer = window.setTimeout(() => setIsCopyVisible(true), COPY_VISIBLE_DELAY);
     const buttonTimer = window.setTimeout(() => setIsButtonVisible(true), BUTTON_VISIBLE_DELAY);
     const readyTimer = window.setTimeout(() => setIsReady(true), BUTTON_READY_DELAY);
@@ -30,24 +34,70 @@ export function OpeningPage({ onBegin }) {
       window.clearTimeout(copyTimer);
       window.clearTimeout(buttonTimer);
       window.clearTimeout(readyTimer);
+      stopOpeningBgm();
     };
   }, []);
+
+  function handleAudioStart() {
+    if (isAudioMuted) {
+      return;
+    }
+
+    startOpeningBgm();
+  }
 
   function handleBegin() {
     if (!isReady || isLeaving) {
       return;
     }
 
+    if (!isAudioMuted) {
+      startOpeningBgm();
+      playSound("click");
+    }
     setIsLeaving(true);
     window.setTimeout(onBegin, EXIT_DELAY);
   }
 
+  function toggleAudio(event) {
+    event.stopPropagation();
+
+    setIsAudioMuted((current) => {
+      const nextMuted = !current;
+      setAudioMuted(nextMuted);
+
+      if (!nextMuted) {
+        startOpeningBgm();
+      }
+
+      return nextMuted;
+    });
+  }
+
   return (
-    <main className={["opening-page", isLeaving ? "is-leaving" : ""].filter(Boolean).join(" ")}>
+    <main
+      className={["opening-page", isLeaving ? "is-leaving" : ""].filter(Boolean).join(" ")}
+      onPointerDown={handleAudioStart}
+    >
       <div className="opening-atmosphere" aria-hidden="true">
         <span className="opening-orbit opening-orbit--one" />
         <span className="opening-orbit opening-orbit--two" />
       </div>
+
+      <button
+        aria-label={isAudioMuted ? "Turn audio on" : "Turn audio off"}
+        aria-pressed={!isAudioMuted}
+        className={["opening-audio-toggle", isAudioMuted ? "is-muted" : ""].filter(Boolean).join(" ")}
+        type="button"
+        onClick={toggleAudio}
+        onPointerDown={(event) => event.stopPropagation()}
+      >
+        {isAudioMuted ? (
+          <VolumeX aria-hidden="true" size={18} strokeWidth={1.8} />
+        ) : (
+          <Volume2 aria-hidden="true" size={18} strokeWidth={1.8} />
+        )}
+      </button>
 
       <section className="opening-panel" aria-labelledby="opening-title">
         <span className="opening-corner opening-corner--tl" aria-hidden="true" />

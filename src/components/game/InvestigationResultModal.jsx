@@ -1,3 +1,4 @@
+import { playSound } from "../../services/audioManager.js";
 import { LocalizedText } from "./LocalizedText.jsx";
 
 export function InvestigationResultModal({
@@ -12,6 +13,11 @@ export function InvestigationResultModal({
 
   if (!isOpen || !entry) {
     return null;
+  }
+
+  function closeWithSound() {
+    playSound("click");
+    onClose();
   }
 
   return (
@@ -45,7 +51,7 @@ export function InvestigationResultModal({
         />
       </div>
 
-      <button className="nick-answer-continue" type="button" onClick={onClose}>
+      <button className="nick-answer-continue" type="button" onClick={closeWithSound}>
         CONTINUE &gt;
       </button>
     </section>

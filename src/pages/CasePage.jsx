@@ -16,6 +16,7 @@ import {
   getAllQuestions,
   getUnlockedClues
 } from "../services/gameEngine.js";
+import { playQuestionClick, playSound } from "../services/audioManager.js";
 
 export function CasePage({ caseData, onArchiveSolved, onBack }) {
   const [languageMode, setLanguageMode] = useState("english");
@@ -59,6 +60,7 @@ export function CasePage({ caseData, onArchiveSolved, onBack }) {
       return;
     }
 
+    playQuestionClick();
     const unlockedBefore = new Set(clues.map((clue) => clue.id));
     const newClues = (caseData.clues ?? []).filter(
       (clue) => (question.unlockClues ?? []).includes(clue.id) && !unlockedBefore.has(clue.id)
@@ -93,6 +95,7 @@ export function CasePage({ caseData, onArchiveSolved, onBack }) {
       return;
     }
 
+    playSound("click");
     setSelectedChoiceId(null);
     setIsTruthOpen(true);
   }
